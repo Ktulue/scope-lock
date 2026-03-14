@@ -32,7 +32,12 @@ Skills are text injected into context; they cannot technically prevent operation
 ### Drift Response
 **A + C: Skip and log, keep moving.**
 
-When a scope change is declined, the agent does not stop execution. It logs the event and continues with in-scope work. If the declined item represents real work that needs doing, it lands in the Follow-up Tasks section for the user to schedule separately.
+Two distinct outcomes when a scope change is not permitted:
+
+- **Decline** — skip it, log it in the Scope Change Log, and optionally add the item to the Out of Scope (Explicit) section if the user wants it recorded as a conscious exclusion. No follow-up task is created.
+- **Defer** — skip it now, log it in the Scope Change Log, and create a Follow-up Task. The item is intended work, just not now. It does NOT get added to Out of Scope (Explicit).
+
+In both cases the agent continues execution without stopping.
 
 ### Contract Generation
 **Collaborative draft (agent proposes, user approves).**
@@ -55,13 +60,16 @@ When the user introduces something new mid-task in the main conversation thread,
 
 One file, three sections, created once and updated throughout execution. This is the primary artifact of the skill.
 
+**Default location:** `SCOPE.md` at the repository root. This makes it immediately visible and easy to find without any configuration. If the user prefers a different location (e.g., `docs/` or a task-specific subdirectory), the agent should respect that instruction at contract creation time.
+
 ### Structure
 
 ```markdown
 # Scope Contract
 **Task:** [plan title / reference]
+**Plan:** [path to source plan document]
 **Date:** [YYYY-MM-DD]
-**Status:** ACTIVE | CLOSED — [N scope changes logged, N follow-up tasks created]
+**Status:** DRAFT | ACTIVE | CLOSED — [N scope changes logged, N follow-up tasks created]
 
 ## In Scope
 - **Files:** [list from plan]
@@ -70,7 +78,7 @@ One file, three sections, created once and updated throughout execution. This is
 
 ## Out of Scope (Explicit)
 - [Items consciously excluded during planning]
-- [Items added here via declined scope changes during execution]
+- [Items added here when user selects Decline on a scope change — not for Deferred items]
 
 ---
 
@@ -111,7 +119,7 @@ Why: Current implementation will cause silent failures in the feature being buil
 Decision needed: Permit / Decline / Defer to Follow-up Tasks
 ```
 
-The agent waits for the user's response before logging and continuing.
+The agent waits for the user's response before logging and continuing. The log entry is written only after the user responds — if the session is interrupted between the flag and the response, no partial entry is created.
 
 ### User-Initiated Expansion (soft flag)
 
@@ -122,7 +130,7 @@ When the user introduces new work mid-task in the main thread:
 Proceeding if confirmed — or I can log it as a follow-up task instead.
 ```
 
-One line, non-blocking, logged regardless of decision.
+One line, non-blocking. "Confirmed" means any affirmative reply (e.g., "yes", "go ahead", "do it") or the user proceeding with a follow-up instruction. Silence or no reply does not count as confirmation — the agent logs it as deferred and continues with in-scope work.
 
 ---
 
@@ -152,7 +160,7 @@ digraph scope_lock {
     "Adjust contract" -> "User reviews contract";
     "Execution begins" -> "Drift detected?";
     "Drift detected?" -> "Flag + await decision" [label="yes"];
-    "Drift detected?" -> "Task complete" [label="no"];
+    "Drift detected?" -> "Task complete" [label="no — user declares done"];
     "Flag + await decision" -> "Permit";
     "Flag + await decision" -> "Decline + log";
     "Flag + await decision" -> "Defer to Follow-up Tasks";
@@ -178,7 +186,9 @@ digraph scope_lock {
 
 ## Session Close
 
-When the task is marked complete, the agent updates the contract header:
+**Trigger:** The session closes when the user explicitly declares the task complete (e.g., "done", "that's everything", marking all plan steps finished) or when executing-plans signals completion. The agent does not self-close — closure always requires a user signal.
+
+When triggered, the agent updates the contract header:
 
 ```markdown
 **Status:** CLOSED — 3 scope changes logged, 1 follow-up task created
@@ -200,6 +210,6 @@ When the task is marked complete, the agent updates the contract header:
 
 - Agent pauses and flags before touching out-of-scope files or adding unspecified features
 - Every scope change event — permitted, declined, or deferred — appears in the Scope Change Log
-- Declined items land in Follow-up Tasks, not lost in conversation history
+- Deferred items land in Follow-up Tasks, not lost in conversation history
 - `SCOPE.md` at task close tells the complete story without requiring the user to scroll through the conversation
 - The contract review step functions as a deliberate self-regulation checkpoint for the user
