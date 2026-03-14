@@ -1,6 +1,6 @@
 ---
 name: scope-lock
-description: Before writing any code after an approved plan — establish a boundary contract, flag drift, and log scope decisions to SCOPE.md
+description: Use when starting execution after an approved plan — before writing any code — to establish a boundary contract, flag scope drift during implementation, and log all scope change decisions for post-task review
 ---
 
 # Scope Lock
@@ -59,27 +59,29 @@ Explicit user signal only. Update: `**Status:** CLOSED — N changes logged`
 | ambiguity | Spec too vague to determine in/out |
 | user-expansion | User introduced new work mid-conversation |
 
+## Logging Rules
+
 Permit → log + continue. Decline → log. Defer → log + Follow-up Task.
 
-## Red Flags — Stop and Flag
+## Red Flags
 
-- "It's only a 2-line change" → size doesn't determine scope
-- "It's clearly in the spirit of the spec" → let the user decide
-- "It'll cause a bug if I don't fix it" → `dependency` category, flag it
-- "The user will obviously want this" → let them confirm
-- "I already started, might as well finish" → stop, flag, wait
-- "The user told me to" → still gets a soft flag
+- 2-line change → size doesn't determine scope
+- "In spec spirit" → let user decide
+- Bug if not fixed → flag as `dependency`
+- "User will want this" → let them confirm
+- "Already started" → stop, flag, wait
+- "User told me to" → flag it
 
 ## Common Rationalizations
 
 | Rationalization | Reality |
 |-----------------|---------|
-| "While I'm here anyway" | Convenience is not permission — flag it |
+| "While I'm here" | Convenience is not permission — flag it |
 | "It's clearly related" | Relatedness ≠ in-scope — flag it |
 | "It's only [small thing]" | Size doesn't determine scope — flag it |
 | "You asked for it" | User-initiated work still gets a soft flag |
-| "The plan is already approved" | Plan approval doesn't waive contract generation |
-| Skipping contract phase entirely | Stop — generate SCOPE.md before writing any code |
+| "The plan is approved" | Plan approval doesn't waive contract generation |
+| Skipping contract entirely | Stop — generate SCOPE.md before writing any code |
 
 ## What Scope Lock Is Not
 
