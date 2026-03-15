@@ -2,6 +2,8 @@
 
 Claude Code skill that enforces task scope boundaries during agent execution, preventing drift beyond the approved plan.
 
+> AI coding agents are great at executing plans — and also great at quietly expanding them. Scope Lock keeps them honest.
+
 ## What It Does
 
 Scope Lock complements front-loaded planning with back-loaded enforcement. After a plan is approved, the skill:
@@ -13,7 +15,6 @@ Scope Lock complements front-loaded planning with back-loaded enforcement. After
 ## Installation
 
 Install via the Claude Code plugin system (requires Claude Code with plugin support):
-
 ```
 /plugin marketplace add Ktulue/scope-lock
 /plugin install scope-lock@scope-lock
@@ -24,7 +25,6 @@ That's it. The `scope-lock` skill will be available in your next Claude Code ses
 ### Manual install (fallback)
 
 If plugin support isn't available, copy the skill directly:
-
 ```bash
 cp skills/scope-lock/SKILL.md ~/.claude/skills/scope-lock/SKILL.md
 ```
@@ -36,13 +36,13 @@ Invoke the skill after a plan is approved, before writing any code:
 > "Use the scope-lock skill to set up the contract for this plan."
 
 The agent will:
+
 - Draft `SCOPE.md` at the repo root with In Scope, Out of Scope, and an empty Scope Change Log
 - Present it for your review
 - Set status to `ACTIVE` after you approve
 - Flag any deviations during execution using `⚠️ SCOPE CHECK` (agent drift) or `↩️ SCOPE NOTE` (user expansion)
 
 ## What SCOPE.md Looks Like After a Session
-
 ```markdown
 # Scope Contract
 **Task:** User Login Feature | **Plan:** docs/plans/login.md | **Date:** 2026-03-14 | **Status:** CLOSED — 2 scope changes logged, 1 follow-up task created
