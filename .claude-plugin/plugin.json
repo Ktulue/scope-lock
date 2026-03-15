@@ -1,0 +1,12 @@
+{
+  "name": "scope-lock",
+  "description": "Enforces task scope boundaries during agent execution, preventing drift beyond the approved plan",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ktulue"
+  },
+  "homepage": "https://github.com/Ktulue/scope-lock",
+  "repository": "https://github.com/Ktulue/scope-lock",
+  "license": "MIT",
+  "keywords": ["scope", "planning", "drift", "enforcement", "productivity"]
+}

@@ -12,13 +12,22 @@ Scope Lock complements front-loaded planning with back-loaded enforcement. After
 
 ## Installation
 
-Copy the skill to your Claude Code skills directory:
+Install via the Claude Code plugin system (requires Claude Code with plugin support):
+
+```
+/plugin marketplace add Ktulue/scope-lock
+/plugin install scope-lock@scope-lock
+```
+
+That's it. The `scope-lock` skill will be available in your next Claude Code session.
+
+### Manual install (fallback)
+
+If plugin support isn't available, copy the skill directly:
 
 ```bash
 cp skills/scope-lock/SKILL.md ~/.claude/skills/scope-lock/SKILL.md
 ```
-
-Verify it appears in your next Claude Code session's skills list as `scope-lock`.
 
 ## Usage
 
