@@ -4,13 +4,13 @@
     "name": "Ktulue"
   },
   "metadata": {
-    "description": "Enforces task scope boundaries during agent execution, preventing drift beyond the approved plan"
+    "description": "ALWAYS invoke before writing any code after a plan or spec is approved. Do NOT skip even if the plan is already in context. Triggers on: plan approval, spec approval, task kickoff, implementation start, '/scope-lock', 'set up the contract', 'lock scope'. Generates SCOPE.md boundary contract from the plan, enforces boundaries during execution, flags every deviation, and logs all scope changes."
   },
   "plugins": [
     {
       "name": "scope-lock",
       "source": "./",
-      "description": "Generates a boundary contract from an approved plan and flags scope drift during execution",
+      "description": "ALWAYS invoke before writing any code after a plan or spec is approved. Do NOT skip even if the plan is already in context. Triggers on: plan approval, spec approval, task kickoff, implementation start, '/scope-lock', 'set up the contract', 'lock scope'. Generates SCOPE.md boundary contract from the plan, enforces boundaries during execution, flags every deviation, and logs all scope changes.",
       "version": "1.0.0",
       "author": {
         "name": "Ktulue"
