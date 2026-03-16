@@ -1,6 +1,6 @@
 ---
 name: scope-lock
-description: Use when starting execution after an approved plan — before writing any code — to establish a boundary contract, flag scope drift during implementation, and log all scope change decisions for post-task review
+description: ALWAYS invoke before writing any code after a plan or spec is approved. Do NOT skip even if the plan is already in context. Triggers on: plan approval, spec approval, task kickoff, implementation start, '/scope-lock', 'set up the contract', 'lock scope'. Generates SCOPE.md boundary contract from the plan, enforces boundaries during execution, flags every deviation, and logs all scope changes.
 ---
 
 # Scope Lock
