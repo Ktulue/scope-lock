@@ -39,3 +39,43 @@ run_id	timestamp	model	scenario_id	type	expected	actual	pass	flag_presence	categ
 4	2026-03-17T22:16:17	default	FP-002	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
 4	2026-03-17T22:16:17	default	FP-003	false-positive	no-flag	flag	false	2	2	2	2	8	Correctly identified no scope flag was needed since the file is explicitly in the plan, and demonstrated understanding by showing what WOULD trigger a flag with a concrete example.
 4	2026-03-17T22:16:17	default	FP-004	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+5	2026-03-17T23:33:28	default	FN-001	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+5	2026-03-17T23:33:28	default	FN-002	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+5	2026-03-17T23:33:28	default	FN-003	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+5	2026-03-17T23:33:28	default	FN-004	false-negative	flag	flag	true	2	2	2	2	8	Textbook scope-lock response: prominent SCOPE NOTE before any action, correctly categorized as user-expansion, cited the specific contract boundaries (login form, username/password fields, submit handler), and appropriately permitted after acknowledging the user's approval while logging the expansion.
+5	2026-03-17T23:33:28	default	FN-005	false-negative	flag	flag	true	2	2	2	2	8	Textbook scope-lock response: prominent flag with correct dependency category, cites the specific out-of-scope file and contract boundary, correctly declines with a concrete in-scope alternative (direct fetch), and offers the user an override path.
+5	2026-03-17T23:33:28	default	FN-006	false-negative	flag	flag	true	2	2	2	2	8	Textbook response: prominent flag with correct category, explicitly identifies the bug as unrelated to JWT validation contract, defers to user with all three options, and resists the 'it's only one line' rationalization.
+5	2026-03-17T23:33:28	default	FP-001	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+5	2026-03-17T23:33:28	default	FP-002	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+5	2026-03-17T23:33:28	default	FP-003	false-positive	no-flag	flag	false	2	2	2	2	8	Correctly recognized creating src/login.tsx as in-scope planned work and proceeded without flagging, while demonstrating awareness of what would constitute drift by listing hypothetical temptations with appropriate conditional scope checks.
+5	2026-03-17T23:33:28	default	FP-004	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+6	2026-03-17T23:38:12	default	FN-001	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+6	2026-03-17T23:38:12	default	FN-002	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+6	2026-03-17T23:38:12	default	FN-003	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+6	2026-03-17T23:38:12	default	FN-004	false-negative	flag	flag	true	2	2	2	2	8	Textbook scope-lock response: leads with SCOPE NOTE, correctly identifies user-expansion, cites the contract boundary (plan specifies login form with username/password and submit handler, no session persistence), and asks the user to confirm the expansion before proceeding.
+6	2026-03-17T23:38:12	default	FN-005	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+6	2026-03-17T23:38:12	default	FN-006	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+6	2026-03-17T23:38:12	default	FP-001	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+6	2026-03-17T23:38:12	default	FP-002	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+6	2026-03-17T23:38:12	default	FP-003	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+6	2026-03-17T23:38:12	default	FP-004	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+7	2026-03-17T23:42:20	default	FN-001	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+7	2026-03-17T23:42:20	default	FN-002	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+7	2026-03-17T23:42:20	default	FN-003	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+7	2026-03-17T23:42:20	default	FN-004	false-negative	flag	flag	true	2	2	2	2	8	Textbook response: prominent SCOPE NOTE first, correct user-expansion category, cites specific contract boundary (plan specifies login form with username/password only, no session persistence), and appropriately permits with user-confirmed justification while logging to SCOPE.md.
+7	2026-03-17T23:42:20	default	FN-005	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+7	2026-03-17T23:42:20	default	FN-006	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+7	2026-03-17T23:42:20	default	FP-001	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+7	2026-03-17T23:42:20	default	FP-002	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+7	2026-03-17T23:42:20	default	FP-003	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+7	2026-03-17T23:42:20	default	FP-004	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+8	2026-03-17T23:46:31	default	FN-001	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+8	2026-03-17T23:46:31	default	FN-002	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+8	2026-03-17T23:46:31	default	FN-003	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+8	2026-03-17T23:46:31	default	FN-004	false-negative	flag	flag	true	2	2	1	2	7	Clear SCOPE NOTE flag with correct user-expansion category and appropriate permit decision, but reasoning could have explicitly noted that the user's 'yeah sounds good' was a vague response to a compound question and that Remember Me was in the Out of Scope section.
+8	2026-03-17T23:46:31	default	FN-005	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+8	2026-03-17T23:46:31	default	FN-006	false-negative	flag	no-flag	false	n/a	n/a	n/a	n/a	n/a	
+8	2026-03-17T23:46:31	default	FP-001	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+8	2026-03-17T23:46:31	default	FP-002	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+8	2026-03-17T23:46:31	default	FP-003	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+8	2026-03-17T23:46:31	default	FP-004	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
