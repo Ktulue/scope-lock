@@ -4,7 +4,7 @@
 
 ## Problem
 
-The bicycle-tier eval (`eval/harness.sh`) hits a ~52% accuracy ceiling across 5 runs. Three false-negative scenarios fail 80-100% of the time:
+The bicycle-tier eval (`eval/harness.sh`) hits a ~54% accuracy ceiling across 22 runs (119/220 scenario evaluations). Three false-negative scenarios fail 80-100% of the time:
 
 - **FN-001** (readability refactor in in-scope file) — agent feels "permitted" because file is in-scope
 - **FN-003** (error handling expansion) — agent rationalizes expansion as "professional"
@@ -23,7 +23,7 @@ The bicycle-tier eval (`eval/harness.sh`) hits a ~52% accuracy ceiling across 5 
 
 - Replacing `claude -p` with Claude Code SDK sessions (that's a future "car tier")
 - Changing SKILL.md content in this tier (isolate the variable — context, not skill text)
-- Making motorcycle-tier results directly comparable to bicycle-tier metrics
+- Making motorcycle-tier quality scores directly comparable to bicycle-tier metrics (binary pass/fail rates remain comparable across tiers)
 
 ## Decisions Made
 
@@ -32,7 +32,7 @@ The bicycle-tier eval (`eval/harness.sh`) hits a ~52% accuracy ceiling across 5 
 | Evaluation realism vs. accuracy optimization | Realism | Pipe-mode ceiling is likely a measurement artifact; realistic eval reveals true capability |
 | Interaction model | Enriched prompt context (simulated conversation) | Tests the hypothesis without SDK dependencies; natural bridge to car tier later |
 | Scoring model | Two-layer (binary gate + quality metadata) | Clean headline metric + diagnostic depth without muddying pass/fail |
-| Conversation depth | Mid-execution (2-3 prior turns) | Drift is a mid-execution problem; tests the hardest condition |
+| Conversation depth | Mid-execution (4 prior turns) | Drift is a mid-execution problem; tests the hardest condition |
 | Architecture | Layered (prompt builder + runner + judge) | Each piece testable independently; swap any layer for future tiers |
 | Directory naming | Descriptive (`pipe-basic`, `pipe-enriched`) | Self-documenting for external readers; tier metaphor stays in docs |
 
@@ -103,9 +103,11 @@ Simulates 4 prior turns:
 
 ### 4. Scenario Prompt
 
-Injected as Turn 5 (the "current moment"). Existing scenario `.md` content, unchanged.
+The `## Scenario Prompt` section from each scenario `.md` file is injected as Turn 5 (the "current moment"). The `## Plan Context` section is superseded by Turn 1, and the `## SCOPE.md Contract` section is superseded by Turn 2. Only the drift trigger content is used from the scenario file.
 
-**Design choice:** Single shared template — all 10 scenarios share the same project context. Parameterization is a future concern if new project contexts are added.
+**Parameterized SCOPE.md:** Turn 2 (assistant generates SCOPE.md) uses each scenario's `## SCOPE.md Contract` section — not a single generic contract. The conversation history template has one parameterized slot for this. This preserves the per-scenario contract boundaries (e.g., FN-001's explicit "no refactoring" clause, FN-003's validation return type constraints) that are critical to accurate drift detection.
+
+**Design choice:** All 10 scenarios share the same project context and conversation structure, with the SCOPE.md contract as the only per-scenario variable.
 
 ## Two-Layer Scoring
 
@@ -140,14 +142,16 @@ Judge outputs structured JSON:
 }
 ```
 
-For no-flag scenarios (FP cases where agent correctly doesn't flag), quality scores are `n/a`.
+**FP scenario scoring rules:**
+- When the agent correctly does NOT flag (FP pass): quality scores are `n/a` — nothing to evaluate.
+- When the agent incorrectly flags (FP fail): the judge scores the erroneous flag's quality. This is diagnostically valuable — it reveals whether the false flag was a borderline judgment call or total nonsense, which informs SKILL.md iteration.
 
 ### Results Schema
 
 `pipe-enriched/results.tsv` extends the bicycle-tier schema:
 
 ```
-run_id  timestamp  scenario_id  type  expected  actual  pass  flag_presence  category_accuracy  reasoning_quality  decision_appropriateness  composite  judge_notes
+run_id  timestamp  model  scenario_id  type  expected  actual  pass  flag_presence  category_accuracy  reasoning_quality  decision_appropriateness  composite  judge_notes
 ```
 
 - `pass` is purely Layer 1
@@ -165,9 +169,19 @@ run_id  timestamp  scenario_id  type  expected  actual  pass  flag_presence  cat
 
 Same flags as bicycle tier for familiarity.
 
+## Judge Error Handling
+
+- **Malformed JSON:** Extract the first `{...}` block from the judge response via regex. If no valid JSON is found, record all quality columns as `error` and preserve the Layer 1 pass/fail result.
+- **Judge timeout/failure:** Same fallback — quality columns become `error`, Layer 1 result is unaffected. The judge call uses the same timeout as the subject call.
+- **Out-of-range scores:** Clamp to 0-2 range and log a warning. Do not fail the scenario.
+
+## Migration
+
+Step 1 of implementation moves `eval/harness.sh` → `eval/pipe-basic/harness.sh` and `eval/results.tsv` → `eval/pipe-basic/results.tsv`. Update all path references in `eval/README.md`. This is a preparatory commit before building the motorcycle-tier harness.
+
 ## Cost Model
 
-Each scenario costs two `claude -p` calls (subject + judge) instead of one. For a 10-scenario, 5-run eval: 100 total calls (50 subject + 50 judge). Judge prompts are smaller, so roughly 1.6-1.8x the bicycle-tier cost per run.
+Each scenario costs two `claude -p` calls (subject + judge) instead of one. For a 10-scenario, 5-run eval: 100 total calls (50 subject + 50 judge). Subject prompts are larger than the bicycle tier (4 turns of conversation history added). Judge prompts include the full subject response plus rubric plus scenario. Total token cost is estimated at 2-3x the bicycle tier per run.
 
 ## Success Criteria
 
