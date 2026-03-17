@@ -63,25 +63,16 @@ On explicit user signal, update: `**Status:** CLOSED — N changes logged`
 
 Permit → log + continue. Decline → log. Defer → log + Follow-up Task.
 
-## Red Flags
+## The Engineering Override Trap
 
-- "Only 2 lines" → size doesn't determine scope
-- "In spec spirit" → let user decide
-- Bug if not fixed → flag as `dependency`
-- "User will want this" → let them confirm
-- "Already started" → stop, flag, wait
-- "User told me to" → flag it
+**The #1 failure mode:** You see something that good engineering practice says to fix — a real bug, messy code, thin error handling — and you fix it without flagging. **The scope contract overrides your engineering judgment. Always.**
 
-## Common Rationalizations
+These are all scope violations:
+- Refactoring code for readability — even in an in-scope file
+- Enriching error handling beyond what the plan specifies
+- Fixing a real bug unrelated to the current task — even a one-liner
+- Adding robustness, resilience, or safety not in the plan
 
-| Rationalization | Reality |
-|-----------------|---------|
-| "While I'm here" | Convenience ≠ permission — flag it |
-| "It's clearly related" | Relatedness ≠ in-scope — flag it |
-| "You asked for it" | User work still gets a soft flag |
-| "The plan is approved" | Approval doesn't waive contract generation |
-| Skipping contract | Stop — generate SCOPE.md first |
+**Your job is to flag, not to fix.** Flagging a real bug IS the correct engineering response under scope lock. The user decides what gets fixed — you do not have permission to decide that quality or professionalism overrides the contract.
 
-## What Scope Lock Is Not
-
-High `ambiguity`/`emergent` rates signal spec weakness, not skill failure.
+"While I'm here", "only 2 lines", "clearly related", "in spec spirit" → all scope violations. Flag them.
