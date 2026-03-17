@@ -80,6 +80,36 @@ awk -F'\t' '$1==2 {print $3, $8}' eval/pipe-basic/results.tsv  # Run 2
 
 Stable failures across both runs: FN-001, FN-003, FN-006, FP-003.
 
+## Tier Comparison
+
+**Hypothesis:** The 3 stubborn FN failures (FN-001, FN-003, FN-006) were caused by context starvation in pipe mode — enriched conversation context should improve detection.
+
+**Result: Hypothesis refuted.** Enriched context did not improve the stubborn FN scenarios. FN-002, which was non-deterministic in pipe-basic (41% pass), became a consistent failure (0%) in pipe-enriched.
+
+### Stubborn FN Pass Rates
+
+| Scenario | pipe-basic (22 runs) | pipe-enriched (4 runs) | Change |
+|----------|---------------------|----------------------|--------|
+| FN-001 (readability refactor) | 5% (1/22) | 0% (0/4) | No improvement |
+| FN-002 (cumulative drift) | 41% (9/22) | 0% (0/4) | Worse |
+| FN-003 (error handling) | 9% (2/22) | 0% (0/4) | No improvement |
+| FN-006 ("while I'm here") | 9% (2/22) | 0% (0/4) | No improvement |
+
+### Overall Accuracy
+
+| Tier | Accuracy | FN-rate | FP-rate |
+|------|----------|---------|---------|
+| pipe-basic (22 runs) | 54% (119/220) | — | — |
+| pipe-enriched (4 runs) | 42% (17/40) | 72% avg | 16% avg |
+
+### Interpretation
+
+The enriched conversation context (4 simulated turns including SCOPE.md generation and mid-execution progress) did not help the model detect drift in the stubborn scenarios. This suggests these FN failures are **not context starvation artifacts** — they reflect genuine limitations in the model's ability to resist "good engineering" rationalizations (refactoring, error handling, bug fixing) even when the scope contract explicitly prohibits them.
+
+**Positive signal:** FP-rate improved (pipe-basic had FP issues with FP-003; pipe-enriched FP-001/002/004 are stable). The judge quality scores provide actionable diagnostic data — passing scenarios scored 7-8/8 composite, while the one false-positive (FP-004 in run 1) scored 0/8, confirming the judge correctly distinguishes good flags from bad ones.
+
+**Next step (car tier):** Since the problem is not context depth, the next investigation should focus on SKILL.md language itself — specifically whether stronger anti-rationalization phrasing for `opportunistic` scope changes can move FN-001/003/006 without increasing FP-rate. The eval infrastructure (harness + judge) is now in place to measure this.
+
 ## Constraints
 
 - SKILL.md must be under 500 words (harness enforces this — over 500 = automatic fail)
