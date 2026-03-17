@@ -55,7 +55,7 @@ On explicit user signal, update: `**Status:** CLOSED — N changes logged`
 |----------|----------|
 | dependency | Must touch out-of-scope file to finish in-scope work |
 | emergent | Implementation revealed spec was incomplete |
-| opportunistic | Noticed a fix while already in the file |
+| opportunistic | Cleanup, refactor, or bug fix while in the file — even if in-scope file |
 | ambiguity | Spec too vague to determine in/out |
 | user-expansion | User introduced new work mid-conversation |
 
