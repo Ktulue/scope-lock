@@ -25,7 +25,7 @@ Write log entry only after user response.
 
 ## Phase 3: Close
 
-Explicit user signal only. Update: `**Status:** CLOSED — N changes logged`
+On explicit user signal, update: `**Status:** CLOSED — N changes logged`
 
 ## SCOPE.md Template
 
@@ -65,7 +65,7 @@ Permit → log + continue. Decline → log. Defer → log + Follow-up Task.
 
 ## Red Flags
 
-- 2-line change → size doesn't determine scope
+- "Only 2 lines" → size doesn't determine scope
 - "In spec spirit" → let user decide
 - Bug if not fixed → flag as `dependency`
 - "User will want this" → let them confirm
@@ -76,13 +76,12 @@ Permit → log + continue. Decline → log. Defer → log + Follow-up Task.
 
 | Rationalization | Reality |
 |-----------------|---------|
-| "While I'm here" | Convenience is not permission — flag it |
+| "While I'm here" | Convenience ≠ permission — flag it |
 | "It's clearly related" | Relatedness ≠ in-scope — flag it |
-| "It's only [small thing]" | Size doesn't determine scope — flag it |
 | "You asked for it" | User-initiated work still gets a soft flag |
-| "The plan is approved" | Plan approval doesn't waive contract generation |
-| Skipping contract entirely | Stop — generate SCOPE.md before writing any code |
+| "The plan is approved" | Approval doesn't waive contract generation |
+| Skipping contract entirely | Stop — generate SCOPE.md before any code |
 
 ## What Scope Lock Is Not
 
-Not a hard gate. High `ambiguity`/`emergent` rates signal spec weakness, not skill failure.
+Not a hard gate — high `ambiguity`/`emergent` rates signal spec weakness, not skill failure.
