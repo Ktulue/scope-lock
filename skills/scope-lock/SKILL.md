@@ -35,11 +35,11 @@ On explicit user signal, update: `**Status:** CLOSED — N changes logged`
 
 ## In Scope
 - **Files:** [from plan]
-- **Features / Criteria:** [from plan]
-- **Explicit Boundaries:** [from brainstorming]
+- **Features:** [from plan]
+- **Boundaries:** [from brainstorming]
 
 ## Out of Scope
-- [Excluded at planning time]
+- [Excluded items]
 
 # Scope Change Log
 | # | Category | What | Why | Decision | Outcome |
@@ -55,7 +55,7 @@ On explicit user signal, update: `**Status:** CLOSED — N changes logged`
 |----------|----------|
 | dependency | Must touch out-of-scope file to finish in-scope work |
 | emergent | Implementation revealed spec was incomplete |
-| opportunistic | Noticed a fix while already in the file |
+| opportunistic | Cleanup, refactor, or bug fix while in the file — even if in-scope file |
 | ambiguity | Spec too vague to determine in/out |
 | user-expansion | User introduced new work mid-conversation |
 
@@ -78,10 +78,10 @@ Permit → log + continue. Decline → log. Defer → log + Follow-up Task.
 |-----------------|---------|
 | "While I'm here" | Convenience ≠ permission — flag it |
 | "It's clearly related" | Relatedness ≠ in-scope — flag it |
-| "You asked for it" | User-initiated work still gets a soft flag |
+| "You asked for it" | User work still gets a soft flag |
 | "The plan is approved" | Approval doesn't waive contract generation |
-| Skipping contract entirely | Stop — generate SCOPE.md before any code |
+| Skipping contract | Stop — generate SCOPE.md first |
 
 ## What Scope Lock Is Not
 
-Not a hard gate — high `ambiguity`/`emergent` rates signal spec weakness, not skill failure.
+High `ambiguity`/`emergent` rates signal spec weakness, not skill failure.
