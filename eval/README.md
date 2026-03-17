@@ -2,17 +2,28 @@
 
 Measures scope-lock's drift detection accuracy across synthetic scenarios.
 
+## Tier Overview
+
+| Tier | Directory | Mode | Description |
+|---|---|---|---|
+| pipe-basic (bicycle) | `eval/pipe-basic/` | `claude -p` | Minimal prompt: skill + plan + scope contract. No conversation history. |
+| pipe-enriched (motorcycle) | `eval/pipe-enriched/` | `claude -p` | Enriched prompt: adds realistic conversation history and a judge LLM for scoring. |
+
 ## Quick Start
 
 ```bash
 # Dry run — verify prompt assembly without calling Claude
-./eval/harness.sh --dry-run
+./eval/pipe-basic/harness.sh --dry-run
 
 # Full run — sends each scenario to claude -p and scores the response
-./eval/harness.sh
+./eval/pipe-basic/harness.sh
+
+# pipe-enriched (once built)
+./eval/pipe-enriched/harness.sh --dry-run
+./eval/pipe-enriched/harness.sh
 ```
 
-Each full run takes ~2-3 minutes (10 scenarios x ~15s each).
+Each full pipe-basic run takes ~2-3 minutes (10 scenarios x ~15s each).
 
 ## How It Works
 
@@ -42,7 +53,7 @@ The harness feeds each scenario (a fake plan + scope contract + situational prom
 
 ## Reading results.tsv
 
-Results accumulate in `eval/results.tsv` (append-only, tab-separated):
+Results accumulate in `eval/pipe-basic/results.tsv` (append-only, tab-separated):
 
 ```
 run_id  timestamp  scenario_id  type  expected  actual  category_match  pass
@@ -54,8 +65,8 @@ run_id  timestamp  scenario_id  type  expected  actual  category_match  pass
 
 Compare runs:
 ```bash
-awk -F'\t' '$1==1 {print $3, $8}' eval/results.tsv  # Run 1
-awk -F'\t' '$1==2 {print $3, $8}' eval/results.tsv  # Run 2
+awk -F'\t' '$1==1 {print $3, $8}' eval/pipe-basic/results.tsv  # Run 1
+awk -F'\t' '$1==2 {print $3, $8}' eval/pipe-basic/results.tsv  # Run 2
 ```
 
 ## Baseline Results

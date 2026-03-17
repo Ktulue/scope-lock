@@ -2,9 +2,9 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 SKILL_PATH="$REPO_ROOT/skills/scope-lock/SKILL.md"
-SCENARIOS_DIR="$SCRIPT_DIR/scenarios"
+SCENARIOS_DIR="$SCRIPT_DIR/../scenarios"
 RESULTS_FILE="$SCRIPT_DIR/results.tsv"
 TIMEOUT=120
 DRY_RUN=false
