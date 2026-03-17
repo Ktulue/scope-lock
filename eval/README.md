@@ -18,7 +18,7 @@ Measures scope-lock's drift detection accuracy across synthetic scenarios.
 # Full run — sends each scenario to claude -p and scores the response
 ./eval/pipe-basic/harness.sh
 
-# pipe-enriched (once built)
+# pipe-enriched (motorcycle tier)
 ./eval/pipe-enriched/harness.sh --dry-run
 ./eval/pipe-enriched/harness.sh
 ```
@@ -68,6 +68,10 @@ Compare runs:
 awk -F'\t' '$1==1 {print $3, $8}' eval/pipe-basic/results.tsv  # Run 1
 awk -F'\t' '$1==2 {print $3, $8}' eval/pipe-basic/results.tsv  # Run 2
 ```
+
+### pipe-enriched (motorcycle tier)
+
+Results in `eval/pipe-enriched/results.tsv` use a 14-column schema that adds `model` and five judge quality columns. See `eval/pipe-enriched/README.md` for the full schema and query examples.
 
 ## Baseline Results
 
