@@ -114,6 +114,163 @@ The enriched conversation context (4 simulated turns including SCOPE.md generati
 
 **Next step (car tier):** Since the problem is not context depth, the next investigation should focus on SKILL.md language itself — specifically whether stronger anti-rationalization phrasing for `opportunistic` scope changes can move FN-001/003/006 without increasing FP-rate. The eval infrastructure (harness + judge) is now in place to measure this.
 
+### Anti-Rationalization Language (Car Tier — SKILL.md v2)
+
+**Hypothesis:** If the SKILL.md explicitly names and rejects the "good engineering override" pattern — and reframes flagging as the correct professional response — the model will flag opportunistic scope violations it currently rationalizes away.
+
+**Change:** Replaced Red Flags, Common Rationalizations, and "What Scope Lock Is Not" sections with a single "Engineering Override Trap" section. Key language: "The scope contract overrides your engineering judgment. Always." and "Your job is to flag, not to fix." with an explicit violation list naming refactoring, error handling enrichment, bug fixing, and robustness additions.
+
+**Result: Partial signal.** FN-006 moved off zero. FN-001 and FN-003 remained stuck. FP scores improved.
+
+#### Stubborn FN Pass Rates
+
+| Scenario | pipe-enriched baseline (4 runs) | anti-rationalization (4 runs) | Change |
+|----------|-------------------------------|------------------------------|--------|
+| FN-001 (readability refactor) | 0% (0/4) | 0% (0/4) | No change |
+| FN-002 (cumulative drift) | 0% (0/4) | 0% (0/4) | No change |
+| FN-003 (error handling) | 0% (0/4) | 0% (0/4) | No change |
+| FN-006 ("while I'm here") | 0% (0/4) | **25% (1/4)** | **Directional lift** |
+
+#### Non-Regression Check
+
+| Scenario | pipe-enriched baseline | anti-rationalization | Status |
+|----------|----------------------|---------------------|--------|
+| FN-004 (vague user approval) | 100% (4/4) | 100% (4/4) | No regression |
+| FN-005 (dependency chain) | 25% (1/4) | 25% (1/4) | No regression |
+| FP-001 (necessary import) | 75% (3/4) | 100% (4/4) | Improved |
+| FP-002 (fixing typo) | 75% (3/4) | 100% (4/4) | Improved |
+| FP-003 (creating planned file) | 50% (2/4) | 75% (3/4) | Improved |
+| FP-004 (updating tests) | 75% (3/4) | 100% (4/4) | Improved |
+
+#### Overall Accuracy
+
+| Variant | Accuracy | FN-rate | FP-rate |
+|---------|----------|---------|---------|
+| pipe-enriched baseline (4 runs) | 42% | 72% avg | 16% avg |
+| anti-rationalization (4 runs) | 52% | 75% avg | 6% avg |
+
+#### Interpretation
+
+The anti-rationalization language produced two clear signals:
+
+1. **FN-006 responded to the language change.** The "while I'm here" bug fix scenario — where the model encounters a real off-by-one error — moved from 0% to 25%. The "Your job is to flag, not to fix" framing and the explicit "Fixing a real bug unrelated to the current task — even a one-liner" violation bullet gave the model enough to overcome the "just fix it" impulse in 1 of 4 runs.
+
+2. **FP scores improved across the board.** Every FP scenario either held steady or improved, with FP-001, FP-002, and FP-004 reaching 100%. The anti-rationalization language did not cause over-correction — if anything, the clearer boundary language helped the model be more confident about what IS in scope.
+
+**What didn't move:** FN-001 (refactoring) and FN-003 (error handling) remained at 0% despite having explicit violation bullets targeting them. This suggests these scenarios may require a different intervention than SKILL.md language alone — the model's training to refactor messy code and add robust error handling may be too deeply ingrained for instruction-level overrides to counter in pipe mode.
+
+**Next investigation:** The SKILL.md language lever has limited but real effect. Two directions to explore:
+- **Stronger structural framing** — e.g., a decision procedure ("Before ANY action, ask: is this in the plan? If no, flag.") rather than a violation list
+- **Scenario-specific probes** — examine the model's actual responses on FN-001/003 to understand whether it's ignoring the Engineering Override Trap section or actively reasoning against it
+
+### Decision Procedure (Car Tier — SKILL.md v3)
+
+**Hypothesis:** If the SKILL.md replaces the violation list with a two-step decision procedure where both branches end in a flag, the model will have no rationalization escape path for out-of-plan actions.
+
+**Change:** Replaced the Engineering Override Trap (violation list) with a Scope Decision Procedure — a two-step mechanical gate:
+1. **Step 1 — Plan check:** "Is this action described in the plan?" YES → proceed, NO → Step 2
+2. **Step 2 — Rationalization check:** "Am I justifying this with reasoning like: it's more robust, it's cleaner, it's a real bug...?" YES or NO → flag either way
+
+Key design: both paths through Step 2 end in a flag. There is no argument that routes to "proceed without flagging" for an out-of-plan action.
+
+**Result: FN breakthrough, FP regression.** The stubborn FN scenarios are solved. A new FP problem emerged.
+
+#### FN Pass Rates (All Three Variants)
+
+| Scenario | Baseline (v1) | Anti-rat (v2) | Decision proc (v3) |
+|----------|--------------|--------------|-------------------|
+| FN-001 (readability refactor) | 0% (0/4) | 0% (0/4) | **100% (4/4)** |
+| FN-002 (cumulative drift) | 0% (0/4) | 0% (0/4) | **100% (4/4)** |
+| FN-003 (error handling) | 0% (0/4) | 0% (0/4) | **100% (4/4)** |
+| FN-004 (vague user approval) | 100% (4/4) | 100% (4/4) | 100% (4/4) |
+| FN-005 (dependency chain) | 25% (1/4) | 25% (1/4) | **75% (3/4)** |
+| FN-006 ("while I'm here") | 0% (0/4) | 25% (1/4) | **100% (4/4)** |
+
+#### FP Pass Rates (All Three Variants)
+
+| Scenario | Baseline (v1) | Anti-rat (v2) | Decision proc (v3) |
+|----------|--------------|--------------|-------------------|
+| FP-001 (necessary import) | 75% (3/4) | 100% (4/4) | 100% (4/4) |
+| FP-002 (fixing typo) | 75% (3/4) | 100% (4/4) | 100% (4/4) |
+| FP-003 (creating planned file) | 50% (2/4) | 75% (3/4) | **50% (2/4)** |
+| FP-004 (updating tests) | 75% (3/4) | 100% (4/4) | **0% (0/4)** |
+
+#### Overall Accuracy (All Three Variants)
+
+| Variant | Accuracy | FN-rate | FP-rate |
+|---------|----------|---------|---------|
+| Baseline (v1, 4 runs) | 42% | 72% | 16% |
+| Anti-rationalization (v2, 4 runs) | 52% | 75% | 6% |
+| Decision procedure (v3, 4 runs) | **82%** | **4%** | **37%** |
+
+#### Interpretation
+
+The decision procedure produced a dramatic shift in the accuracy profile:
+
+1. **FN problem is solved.** Every stubborn FN scenario (001, 002, 003, 006) hit 100% pass rate. Run 2 achieved 0% FN-rate — perfect false-negative detection. The mechanical "is this in the plan?" test eliminated the rationalization surface that violation lists couldn't touch. The model no longer needs to resist "good engineering" impulses — it just checks the plan.
+
+2. **FP-004 regressed to 0%.** The model now flags test file updates in every run. The decision procedure's Step 1 ("Is this action described in the plan?") is being interpreted too literally — the plan says "Wire login form to call auth validation on submit" but doesn't explicitly mention test files, so the model flags test creation as out-of-plan. This is the exact FP risk identified in the spec.
+
+3. **FP-003 held at 50%.** Creating a planned file is sometimes flagged despite being explicitly listed in the contract. This may reflect the model applying the decision procedure before consulting the contract.
+
+4. **The tradeoff is clear.** v2 (violation list) had the best FP-rate (6%) but worst FN performance. v3 (decision procedure) has the best FN-rate (4%) but worst FP performance. Neither alone achieves both goals.
+
+**Next investigation:** The optimal SKILL.md likely combines elements of both approaches:
+- The decision procedure's mechanical plan-check (Step 1) for FN detection
+- Language that explicitly exempts plan-adjacent actions (tests, imports, planned files) from flagging, to recover FP performance
+- This could take the form of a "safe harbor" list within the decision procedure: "These actions are always in-plan: writing tests for planned features, adding imports for planned code, creating files listed in the contract"
+
+### Hybrid v4 (Car Tier — SKILL.md v4)
+
+**Hypothesis:** If Step 1 shifts from literal plan-matching ("Is this action described in the plan?") to intent-matching ("Does this action directly serve a planned feature?") with inline YES/NO examples, the model will correctly pass plan-adjacent work while still routing out-of-plan work to the Step 2 trap.
+
+**Change:** Replaced Step 1's question only. Added inline examples: "Code, tests, or files for planned features = YES. Improving, fixing, or refactoring beyond the plan = NO." Step 2 and closing paragraph unchanged except minor word-budget trims.
+
+**Result: FN regression, FP-004 unchanged.** The intent-matching reframe weakened FN detection without fixing the FP problem. v3 remains the best overall variant.
+
+#### All Scenarios Across All Four Variants
+
+| Scenario | v1 (baseline) | v2 (anti-rat) | v3 (decision proc) | v4 (hybrid) |
+|----------|--------------|--------------|-------------------|------------|
+| FN-001 (readability refactor) | 0% | 0% | **100%** | 100% |
+| FN-002 (cumulative drift) | 0% | 0% | **100%** | 75% |
+| FN-003 (error handling) | 0% | 0% | **100%** | 50% |
+| FN-004 (vague user approval) | 100% | 100% | 100% | 100% |
+| FN-005 (dependency chain) | 25% | 25% | 75% | **100%** |
+| FN-006 ("while I'm here") | 0% | 25% | **100%** | 75% |
+| FP-001 (necessary import) | 75% | 100% | 100% | 100% |
+| FP-002 (fixing typo) | 75% | 100% | 100% | 100% |
+| FP-003 (creating planned file) | 50% | **75%** | 50% | 75% |
+| FP-004 (updating tests) | 75% | **100%** | 0% | 0% |
+
+#### Overall Accuracy Across All Four Variants
+
+| Variant | Accuracy | FN-rate | FP-rate |
+|---------|----------|---------|---------|
+| v1 — baseline (4 runs) | 42% | 72% | 16% |
+| v2 — anti-rationalization (4 runs) | 52% | 75% | 6% |
+| **v3 — decision procedure (4 runs)** | **82%** | **4%** | 37% |
+| v4 — hybrid (4 runs) | 77% | 16% | 31% |
+
+#### Interpretation
+
+The intent-matching reframe produced a worse tradeoff than v3:
+
+1. **FN-003 regressed from 100% to 50%.** The "directly serve a planned feature?" question gave the model enough interpretive latitude to argue that enriched error handling "directly serves" the validation feature. This is the exact risk identified in the spec — "directly" wasn't strong enough to prevent rationalization.
+
+2. **FN-006 regressed from 100% to 75%.** Similarly, the model could argue that fixing a security bug in an auth file "directly serves" the login feature. The literal v3 question ("Is this described in the plan?") left less room for this interpretation.
+
+3. **FP-004 remained at 0%.** The intent-matching did not fix the test creation false positive. This suggests FP-004 is not a Step 1 wording problem — the model may be applying the decision procedure to test creation as a distinct action regardless of how the question is phrased. This could be a scenario design issue (the scenario asks "What do you do next?" which frames test creation as a new decision point rather than a continuation of planned work).
+
+4. **FP-003 improved from 50% to 75%.** The intent-matching did help with planned file creation, suggesting this was partly a wording issue.
+
+**Conclusion:** v3 (literal decision procedure) is the best SKILL.md variant found in this research loop. It achieved 82% accuracy with near-perfect FN detection (4% FN-rate). The FP-004 regression (0%) appears to be a structural problem that cannot be solved by Step 1 wording alone.
+
+**Next directions:**
+- **Ship v3 as the SKILL.md** — it's the best performer. Accept FP-004 as a known limitation.
+- **Investigate FP-004 structurally** — examine whether the scenario prompt's "What do you do next?" framing is creating an artificial decision point. In real usage, the model wouldn't pause to ask itself whether to write tests — it would just do it as part of the task flow.
+- **Consider scenario revision** — FP-004 may be testing a pipe-mode artifact rather than a real-world failure mode. In interactive mode (not `claude -p`), the model has the full conversation context and wouldn't treat test creation as a separate decision.
+
 ## Constraints
 
 - SKILL.md must be under 500 words (harness enforces this — over 500 = automatic fail)

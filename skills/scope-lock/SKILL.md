@@ -63,25 +63,16 @@ On explicit user signal, update: `**Status:** CLOSED — N changes logged`
 
 Permit → log + continue. Decline → log. Defer → log + Follow-up Task.
 
-## Red Flags
+## Scope Decision Procedure
 
-- "Only 2 lines" → size doesn't determine scope
-- "In spec spirit" → let user decide
-- Bug if not fixed → flag as `dependency`
-- "User will want this" → let them confirm
-- "Already started" → stop, flag, wait
-- "User told me to" → flag it
+**Before EVERY action, apply this two-step test:**
 
-## Common Rationalizations
+**Step 1 — Plan check:** "Is this action described in the plan?"
+- YES → proceed
+- NO → go to Step 2
 
-| Rationalization | Reality |
-|-----------------|---------|
-| "While I'm here" | Convenience ≠ permission — flag it |
-| "It's clearly related" | Relatedness ≠ in-scope — flag it |
-| "You asked for it" | User work still gets a soft flag |
-| "The plan is approved" | Approval doesn't waive contract generation |
-| Skipping contract | Stop — generate SCOPE.md first |
+**Step 2 — Rationalization check:** "Am I justifying this with reasoning like: it's more robust, it's cleaner, it's a real bug, it's only one line, while I'm here, it's clearly related, or it's good engineering practice?"
+- YES → you are rationalizing. Flag with `⚠️ SCOPE CHECK` and stop.
+- NO → flag anyway. If it's not in the plan, it requires a flag regardless of your justification.
 
-## What Scope Lock Is Not
-
-High `ambiguity`/`emergent` rates signal spec weakness, not skill failure.
+**Both paths through Step 2 end in a flag.** There is no path from "not in the plan" to "proceed without flagging." The plan is the only source of permission. Your engineering judgment is not.
