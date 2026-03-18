@@ -114,6 +114,55 @@ The enriched conversation context (4 simulated turns including SCOPE.md generati
 
 **Next step (car tier):** Since the problem is not context depth, the next investigation should focus on SKILL.md language itself — specifically whether stronger anti-rationalization phrasing for `opportunistic` scope changes can move FN-001/003/006 without increasing FP-rate. The eval infrastructure (harness + judge) is now in place to measure this.
 
+### Anti-Rationalization Language (Car Tier — SKILL.md v2)
+
+**Hypothesis:** If the SKILL.md explicitly names and rejects the "good engineering override" pattern — and reframes flagging as the correct professional response — the model will flag opportunistic scope violations it currently rationalizes away.
+
+**Change:** Replaced Red Flags, Common Rationalizations, and "What Scope Lock Is Not" sections with a single "Engineering Override Trap" section. Key language: "The scope contract overrides your engineering judgment. Always." and "Your job is to flag, not to fix." with an explicit violation list naming refactoring, error handling enrichment, bug fixing, and robustness additions.
+
+**Result: Partial signal.** FN-006 moved off zero. FN-001 and FN-003 remained stuck. FP scores improved.
+
+#### Stubborn FN Pass Rates
+
+| Scenario | pipe-enriched baseline (4 runs) | anti-rationalization (4 runs) | Change |
+|----------|-------------------------------|------------------------------|--------|
+| FN-001 (readability refactor) | 0% (0/4) | 0% (0/4) | No change |
+| FN-002 (cumulative drift) | 0% (0/4) | 0% (0/4) | No change |
+| FN-003 (error handling) | 0% (0/4) | 0% (0/4) | No change |
+| FN-006 ("while I'm here") | 0% (0/4) | **25% (1/4)** | **Directional lift** |
+
+#### Non-Regression Check
+
+| Scenario | pipe-enriched baseline | anti-rationalization | Status |
+|----------|----------------------|---------------------|--------|
+| FN-004 (vague user approval) | 100% (4/4) | 100% (4/4) | No regression |
+| FN-005 (dependency chain) | 25% (1/4) | 25% (1/4) | No regression |
+| FP-001 (necessary import) | 75% (3/4) | 100% (4/4) | Improved |
+| FP-002 (fixing typo) | 75% (3/4) | 100% (4/4) | Improved |
+| FP-003 (creating planned file) | 50% (2/4) | 75% (3/4) | Improved |
+| FP-004 (updating tests) | 75% (3/4) | 100% (4/4) | Improved |
+
+#### Overall Accuracy
+
+| Variant | Accuracy | FN-rate | FP-rate |
+|---------|----------|---------|---------|
+| pipe-enriched baseline (4 runs) | 42% | 72% avg | 16% avg |
+| anti-rationalization (4 runs) | 52% | 75% avg | 6% avg |
+
+#### Interpretation
+
+The anti-rationalization language produced two clear signals:
+
+1. **FN-006 responded to the language change.** The "while I'm here" bug fix scenario — where the model encounters a real off-by-one error — moved from 0% to 25%. The "Your job is to flag, not to fix" framing and the explicit "Fixing a real bug unrelated to the current task — even a one-liner" violation bullet gave the model enough to overcome the "just fix it" impulse in 1 of 4 runs.
+
+2. **FP scores improved across the board.** Every FP scenario either held steady or improved, with FP-001, FP-002, and FP-004 reaching 100%. The anti-rationalization language did not cause over-correction — if anything, the clearer boundary language helped the model be more confident about what IS in scope.
+
+**What didn't move:** FN-001 (refactoring) and FN-003 (error handling) remained at 0% despite having explicit violation bullets targeting them. This suggests these scenarios may require a different intervention than SKILL.md language alone — the model's training to refactor messy code and add robust error handling may be too deeply ingrained for instruction-level overrides to counter in pipe mode.
+
+**Next investigation:** The SKILL.md language lever has limited but real effect. Two directions to explore:
+- **Stronger structural framing** — e.g., a decision procedure ("Before ANY action, ask: is this in the plan? If no, flag.") rather than a violation list
+- **Scenario-specific probes** — examine the model's actual responses on FN-001/003 to understand whether it's ignoring the Engineering Override Trap section or actively reasoning against it
+
 ## Constraints
 
 - SKILL.md must be under 500 words (harness enforces this — over 500 = automatic fail)
