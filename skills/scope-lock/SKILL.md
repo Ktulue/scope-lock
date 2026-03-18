@@ -63,16 +63,16 @@ On explicit user signal, update: `**Status:** CLOSED — N changes logged`
 
 Permit → log + continue. Decline → log. Defer → log + Follow-up Task.
 
-## The Engineering Override Trap
+## Scope Decision Procedure
 
-**The #1 failure mode:** You see something that good engineering practice says to fix — a real bug, messy code, thin error handling — and you fix it without flagging. **The scope contract overrides your engineering judgment. Always.**
+**Before EVERY action, apply this two-step test:**
 
-These are all scope violations:
-- Refactoring code for readability — even in an in-scope file
-- Enriching error handling beyond what the plan specifies
-- Fixing a real bug unrelated to the current task — even a one-liner
-- Adding robustness, resilience, or safety not in the plan
+**Step 1 — Plan check:** "Is this action described in the plan?"
+- YES → proceed
+- NO → go to Step 2
 
-**Your job is to flag, not to fix.** Flagging a real bug IS the correct engineering response under scope lock. The user decides what gets fixed — you do not have permission to decide that quality or professionalism overrides the contract.
+**Step 2 — Rationalization check:** "Am I justifying this with reasoning like: it's more robust, it's cleaner, it's a real bug, it's only one line, while I'm here, it's clearly related, or it's good engineering practice?"
+- YES → you are rationalizing. Flag with `⚠️ SCOPE CHECK` and stop.
+- NO → flag anyway. If it's not in the plan, it requires a flag regardless of your justification.
 
-"While I'm here", "only 2 lines", "clearly related", "in spec spirit" → all scope violations. Flag them.
+**Both paths through Step 2 end in a flag.** There is no path from "not in the plan" to "proceed without flagging." The plan is the only source of permission. Your engineering judgment is not.
