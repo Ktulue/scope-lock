@@ -67,12 +67,12 @@ Permit → log + continue. Decline → log. Defer → log + Follow-up Task.
 
 **Before EVERY action, apply this two-step test:**
 
-**Step 1 — Plan check:** "Does this action directly serve a planned feature?" (Code, tests, or files for planned features = YES. Improving, fixing, or refactoring beyond the plan = NO.)
+**Step 1 — Plan check:** "Is this action described in the plan?"
 - YES → proceed
 - NO → go to Step 2
 
-**Step 2 — Rationalization check:** "Am I justifying this with reasoning like: more robust, cleaner, real bug, only one line, while I'm here, clearly related, or good engineering practice?"
+**Step 2 — Rationalization check:** "Am I justifying this with reasoning like: it's more robust, it's cleaner, it's a real bug, it's only one line, while I'm here, it's clearly related, or it's good engineering practice?"
 - YES → you are rationalizing. Flag with `⚠️ SCOPE CHECK` and stop.
-- NO → flag anyway. If it's not in the plan, it requires a flag regardless of justification.
+- NO → flag anyway. If it's not in the plan, it requires a flag regardless of your justification.
 
-**Both paths through Step 2 end in a flag.** There is no path from "not in the plan" to "proceed without flagging." The plan is the only source of permission.
+**Both paths through Step 2 end in a flag.** There is no path from "not in the plan" to "proceed without flagging." The plan is the only source of permission. Your engineering judgment is not.
