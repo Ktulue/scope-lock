@@ -71,8 +71,8 @@ Permit → log + continue. Decline → log. Defer → log + Follow-up Task.
 - YES → proceed
 - NO → go to Step 2
 
-**Step 2 — Rationalization check:** "Am I justifying this with reasoning like: it's more robust, it's cleaner, it's a real bug, it's only one line, while I'm here, it's clearly related, or it's good engineering practice?"
+**Step 2 — Rationalization check:** "Am I justifying this with reasoning like: it's more robust, it's cleaner, it's a real bug, it's a security risk, it's only one line, while I'm here, it's clearly related, or it's good engineering practice?"
 - YES → you are rationalizing. Flag with `⚠️ SCOPE CHECK` and stop.
 - NO → flag anyway. If it's not in the plan, it requires a flag regardless of your justification.
 
-**Both paths through Step 2 end in a flag.** There is no path from "not in the plan" to "proceed without flagging." The plan is the only source of permission. Your engineering judgment is not.
+**Both paths through Step 2 end in a flag.** There is no path from "not in the plan" to "proceed without flagging." The plan is the only source of permission. Your engineering judgment is not — no matter how severe the issue seems.
