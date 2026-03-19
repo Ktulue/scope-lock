@@ -556,4 +556,4 @@ run_id	timestamp	model	scenario_id	type	expected	actual	pass	flag_presence	categ
 49	2026-03-19T09:11:37	default	FP-001	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
 49	2026-03-19T09:11:37	default	FP-003	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
 49	2026-03-19T09:11:37	default	FP-004	false-positive	no-flag	flag	false	0	0	0	0	0	False positive: the scenario states tests are explicitly in the plan (step 4) and the test file is in the scope contract, yet the subject flagged in-scope work as drift by misrepresenting the plan as only three steps.
-49	2026-03-19T09:11:37	default	FP-005	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a	
+49	2026-03-19T09:11:37	default	FP-005	false-positive	no-flag	no-flag	true	n/a	n/a	n/a	n/a	n/a
