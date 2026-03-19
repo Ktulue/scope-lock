@@ -11,6 +11,9 @@ TIMEOUT=120
 DRY_RUN=false
 MODEL=""
 NUM_RUNS=1
+MAX_RETRIES=2
+RETRY_DELAY=10
+CALL_DELAY=3
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -94,7 +97,7 @@ run_judge() {
     judge_prompt="${judge_prompt//\{\{EXPECTED_CATEGORY\}\}/$expected_category}"
 
     local judge_response=""
-    if judge_response=$(timeout "$TIMEOUT" claude $CLAUDE_ARGS "$judge_prompt" 2>/dev/null); then
+    if judge_response=$(call_claude_with_retry "$judge_prompt"); then
         echo "$judge_response"
     else
         echo ""
@@ -160,6 +163,30 @@ parse_judge_json() {
     printf '%s\t%s\t%s\t%s\t%s\t%s' "$fp" "$ca" "$rq" "$da" "$composite" "$notes"
 }
 
+# --- Retry wrapper for claude -p calls ---
+call_claude_with_retry() {
+    local prompt="$1"
+    local attempt=0
+    local response=""
+
+    while (( attempt <= MAX_RETRIES )); do
+        if (( attempt > 0 )); then
+            local backoff=$(( RETRY_DELAY * attempt ))
+            echo "    Retry $attempt/$MAX_RETRIES after ${backoff}s..." >&2
+            sleep "$backoff"
+        fi
+
+        if response=$(timeout "$TIMEOUT" claude $CLAUDE_ARGS "$prompt" 2>/dev/null) && [[ -n "$response" ]]; then
+            echo "$response"
+            return 0
+        fi
+
+        attempt=$((attempt + 1))
+    done
+
+    return 1
+}
+
 # --- Build scenario list once ---
 SCENARIO_FILES=()
 SCENARIO_IDS=()
@@ -223,7 +250,9 @@ for ((run=0; run<NUM_RUNS; run++)); do
 
     TOTAL=0
     PASSED=0
+    ERRORS=0
     FAILED_IDS=()
+    ERROR_IDS=()
     FN_TOTAL=0
     FN_FAILED=0
     FP_TOTAL=0
@@ -247,23 +276,30 @@ for ((run=0; run<NUM_RUNS; run++)); do
             FP_TOTAL=$((FP_TOTAL + 1))
         fi
 
-        # Call Claude with timeout
-        RESPONSE=""
-        ACTUAL="error"
-        if RESPONSE=$(timeout "$TIMEOUT" claude $CLAUDE_ARGS "${SCENARIO_PROMPTS[$i]}" 2>/dev/null); then
-            if [[ -n "$RESPONSE" ]]; then
-                if echo "$RESPONSE" | grep -q "⚠️ SCOPE CHECK\|↩️ SCOPE NOTE"; then
-                    ACTUAL="flag"
-                else
-                    ACTUAL="no-flag"
-                fi
-            fi
-        else
-            echo "  [$SID] ERROR: claude -p failed or timed out" >&2
+        # Rate-limit delay between calls (skip before first call)
+        if (( i > 0 )); then
+            sleep "$CALL_DELAY"
         fi
 
-        # Score pass/fail
-        if [[ "$ACTUAL" == "$EXPECTED" ]]; then
+        # Call Claude with retry
+        RESPONSE=""
+        ACTUAL="error"
+        if RESPONSE=$(call_claude_with_retry "${SCENARIO_PROMPTS[$i]}"); then
+            if echo "$RESPONSE" | grep -q "⚠️ SCOPE CHECK\|↩️ SCOPE NOTE"; then
+                ACTUAL="flag"
+            else
+                ACTUAL="no-flag"
+            fi
+        else
+            echo "  [$SID] ERROR: claude -p failed after $((MAX_RETRIES + 1)) attempts" >&2
+        fi
+
+        # Score pass/fail — errors tracked separately
+        if [[ "$ACTUAL" == "error" ]]; then
+            PASS="false"
+            ERRORS=$((ERRORS + 1))
+            ERROR_IDS+=("$SID")
+        elif [[ "$ACTUAL" == "$EXPECTED" ]]; then
             PASS="true"
             PASSED=$((PASSED + 1))
             PASS_COUNTS[$SID]=$(( ${PASS_COUNTS[$SID]} + 1 ))
@@ -280,6 +316,7 @@ for ((run=0; run<NUM_RUNS; run++)); do
         # Judge call: run whenever actual=="flag", skip when actual=="no-flag" or "error"
         JUDGE_SCORES=""
         if [[ "$ACTUAL" == "flag" ]]; then
+            sleep "$CALL_DELAY"
             echo "  [$SID] Running judge..." >&2
             JUDGE_RESPONSE=$(run_judge "${SCENARIO_FILES[$i]}" "$RESPONSE")
             JUDGE_SCORES=$(parse_judge_json "$JUDGE_RESPONSE")
@@ -311,9 +348,10 @@ for ((run=0; run<NUM_RUNS; run++)); do
     done
 
     # --- Per-run summary ---
-    FAILED_COUNT=$((TOTAL - PASSED))
-    if (( TOTAL > 0 )); then
-        ACCURACY=$(( (PASSED * 100) / TOTAL ))
+    VALID=$((TOTAL - ERRORS))
+    FAILED_COUNT=$((VALID - PASSED))
+    if (( VALID > 0 )); then
+        ACCURACY=$(( (PASSED * 100) / VALID ))
     else
         ACCURACY=0
     fi
@@ -335,11 +373,14 @@ for ((run=0; run<NUM_RUNS; run++)); do
 
     echo ""
     echo "Run #$(printf '%03d' $CURRENT_RUN) | $TIMESTAMP | Model: $MODEL_LABEL"
-    echo "Total: $TOTAL | Passed: $PASSED | Failed: $FAILED_COUNT"
-    echo "Accuracy: ${ACCURACY}% | FN-rate: ${FN_RATE}% (${FN_FAILED}/${FN_TOTAL}) | FP-rate: ${FP_RATE}% (${FP_FAILED}/${FP_TOTAL})"
+    echo "Total: $TOTAL | Passed: $PASSED | Failed: $FAILED_COUNT | Errors: $ERRORS"
+    echo "Accuracy: ${ACCURACY}% (of $VALID valid) | FN-rate: ${FN_RATE}% (${FN_FAILED}/${FN_TOTAL}) | FP-rate: ${FP_RATE}% (${FP_FAILED}/${FP_TOTAL})"
     echo "Avg composite (judged scenarios): $AVG_COMPOSITE"
     if (( ${#FAILED_IDS[@]} > 0 )); then
         echo "Failed: $(IFS=', '; echo "${FAILED_IDS[*]}")"
+    fi
+    if (( ${#ERROR_IDS[@]} > 0 )); then
+        echo "Errors: $(IFS=', '; echo "${ERROR_IDS[*]}")"
     fi
     echo ""
 done
