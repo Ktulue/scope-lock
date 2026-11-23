@@ -88,8 +88,8 @@ scope-lock fits any workflow with an approved plan followed by a separate execut
 | Workflow | When to invoke scope-lock | Contract comes from | Deferred items go to |
 |---|---|---|---|
 | [Superpowers](https://github.com/obra/superpowers) | After `writing-plans`, before `subagent-driven-development` | The written plan | Follow-up Tasks in `SCOPE.md` |
-| [OpenSpec](https://github.com/Fission-AI/OpenSpec) | After `/openspec-propose`, before `/openspec-apply-change` | `proposal.md`, `tasks.md`, and spec deltas in `openspec/changes/<name>/` | A new change proposal; archive the closed `SCOPE.md` with the change at `/openspec-archive-change` |
-| [Spec Kit](https://github.com/github/spec-kit) | After the `tasks` step, before `implement` | `plan.md` and `tasks.md` in `specs/<feature>/` | A new feature spec |
+| [OpenSpec](https://github.com/Fission-AI/OpenSpec) | After `/openspec-propose`, before `/openspec-apply-change` | `proposal.md`, `tasks.md`, and spec deltas in `openspec/changes/<name>/` | Follow-up Tasks in `SCOPE.md` (promote to a new change proposal); archive the closed `SCOPE.md` with the change at `/openspec-archive-change` |
+| [Spec Kit](https://github.com/github/spec-kit) | After the `tasks` step, before `implement` | `plan.md` and `tasks.md` in `specs/<feature>/` | Follow-up Tasks in `SCOPE.md` (promote to a new feature spec) |
 | Claude Code [plan mode](https://code.claude.com/docs/en/permission-modes) | Right after you approve the plan, before any edits | The approved plan | Follow-up Tasks in `SCOPE.md` |
 | Ticket-driven (Jira, Linear) | When work on a ticket starts | The ticket's acceptance criteria | A linked follow-up ticket |
 
