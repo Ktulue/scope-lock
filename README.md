@@ -65,9 +65,18 @@ The agent will:
 - [ ] Add loading spinner to login button — from scope change #2
 ```
 
+## Evaluation
+
+scope-lock ships with an eval suite that measures drift-detection accuracy across synthetic scenarios: false negatives (drift it should flag) and false positives (in-scope work it shouldn't).
+
+- **pipe-basic:** runs each scenario through `claude -p` and checks for the expected `⚠️ SCOPE CHECK` / `↩️ SCOPE NOTE` markers.
+- **pipe-enriched:** adds realistic conversation history and scores responses with an LLM-as-judge rubric.
+
+See [`eval/README.md`](eval/README.md) to run it.
+
 ## Integration
 
-Works standalone with any plan document. Pairs naturally with the [SuperPowers](https://github.com/anthropics/claude-code-plugins) planning workflow:
+Works standalone with any plan document. Pairs naturally with [Superpowers](https://github.com/obra/superpowers) by Jesse Vincent (install with `/plugin install superpowers@claude-plugins-official`):
 
 - After `superpowers:writing-plans` → invoke scope-lock to generate the contract
 - During `superpowers:subagent-driven-development` → scope-lock governs the execution boundary
